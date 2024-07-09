@@ -63,7 +63,7 @@ const initializeTaxis = async () => {
   let id = 1;
 
   for (const city of cities) {
-    for (let i = 0; i < 20; i++) { // Adjust the number of taxis as needed
+    for (let i = 0; i < 200; i++) { // Adjust the number of taxis as needed
       const taxi = await generateRandomTaxi(id, city);
       console.log(taxi);
       if (taxi) {

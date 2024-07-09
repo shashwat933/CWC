@@ -192,9 +192,6 @@ wss.on('connection', (ws) => {
       } else {
         ws.send('Invalid selection. Please enter a valid number corresponding to a location.');
       }
-    } else if (step === 8) {
-      // Handling additional steps if needed
-      ws.send('Thank you for booking with us. We will confirm your taxi availability soon.');
     }
   });
 
