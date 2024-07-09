@@ -3,7 +3,7 @@ const axios = require('axios');
 const { MongoClient, ObjectID } = require('mongodb');
 
 const port = 8089;
-const mongoUrl = 'mongodb+srv://code:8SwbDJ8KrtomSjB4@cluster0.fs3bvvp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const mongoUrl = 'mongodb+srv://Shashwat:Shashwat@shashwat.l2xydbe.mongodb.net/';
 const dbName = 'taxiServiceDB';
 const collectionName = 'assignedTaxis';
 
@@ -11,19 +11,17 @@ const wss = new WebSocket.Server({ port });
 
 console.log(`WebSocket server (Taxi Agent Bot) is running on ws://localhost:${port}`);
 
-const cities = ['Bangalore','Gwalior', 'Varanasi',  'Delhi', 'Gurgaon', 'Hyderabad'];
+const cities = ['Bangalore', 'Gwalior', 'Varanasi', 'Delhi', 'Gurgaon', 'Hyderabad'];
 
-// MongoDB client
 let client;
 
-// Connect to MongoDB and clear existing collection
 const connectToMongoDB = async () => {
   try {
     client = new MongoClient(mongoUrl);
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
-    await collection.deleteMany({}); // Clear existing data
+    await collection.deleteMany({});
     console.log("Connected to MongoDB server and cleared collection");
   } catch (err) {
     console.error("Error connecting to MongoDB:", err);
@@ -34,7 +32,6 @@ connectToMongoDB();
 
 const generateRandomTaxi = async (id, city) => {
   try {
-    // Fetch a random location within the city
     const locationResponse = await axios.get('https://nominatim.openstreetmap.org/search', {
       params: {
         q: city,
@@ -48,9 +45,9 @@ const generateRandomTaxi = async (id, city) => {
     return {
       id,
       isAssigned: false,
-      isAvailable: Math.random() > 0.5, // 50% chance of availability
+      isAvailable: Math.random() > 0.5,
       taxiLocation: city,
-      locationDetails: `${location.display_name} (lat: ${location.lat}, lon: ${location.lon})`
+      locationDetails: `${location.display_name} \n`
     };
   } catch (error) {
     console.error('Error generating random taxi:', error);
@@ -63,7 +60,7 @@ const initializeTaxis = async () => {
   let id = 1;
 
   for (const city of cities) {
-    for (let i = 0; i < 200; i++) { // Adjust the number of taxis as needed
+    for (let i = 0; i < 20; i++) {
       const taxi = await generateRandomTaxi(id, city);
       console.log(taxi);
       if (taxi) {
@@ -76,7 +73,6 @@ const initializeTaxis = async () => {
   return taxis;
 };
 
-// Assign taxis directly when a client connects
 const assignTaxisToClient = async (ws) => {
   const taxis = await initializeTaxis();
   const db = client.db(dbName);
@@ -98,13 +94,11 @@ const assignTaxisToClient = async (ws) => {
   }));
 };
 
-// WebSocket server handling connections
 wss.on('connection', (ws) => {
   console.log('A new client connected to the Taxi Agent Bot');
   assignTaxisToClient(ws);
 });
 
-// Close MongoDB connection when the server closes
 wss.on('close', () => {
   if (client) {
     client.close().then(() => {
